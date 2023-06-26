@@ -1,5 +1,4 @@
 ---
-- hosts: database-vm
   tasks:
   - name: install the mysql-server
     apt:
