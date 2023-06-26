@@ -1,69 +1,59 @@
 ---
-- hosts: database-vm
-  tasks:
-  - name: install the mysql-server
-    apt:
-      name: mysql-server
-      update_cache: true
-      state: latest
+- name: Install software
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - mysql-server
+    - mysql-client
+    - python3-pymysql
 
-  - name: install the mysql-client
-    apt:
-      name: mysql-client
-      update_cache: true
-      state: latest
+- name: Enshure that mysql already started
+  ansible.builtin.systemd:
+    name: mysql
+    state: started
+    enabled: true
+    masked: false
+    daemon_reload: true
 
-  - name: install the pymysql
-    apt:
-      name: python3-pymysql
-      update_cache: true
-      state: latest
+- name: Set password for root user
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    priv: '*.*:ALL,GRANT'
+    host: localhost
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    state: present
 
-  - name: enshure that mysql already started
-    ansible.builtin.systemd:
-      name: mysql
-      state: started
-      enabled: true
-      masked: no
-      daemon_reload: true
+- name: Save root password in .my.cnf
+  ansible.builtin.template:
+    src: root_cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    mode: "0600"
 
-  - name: set password for root user
-    mysql_user:
-      name: root
-      password: "{{ mysql_root_password }}"
-      priv: '*.*:ALL,GRANT'
-      host: localhost
-      login_unix_socket: /var/run/mysqld/mysqld.sock
-      state: present
-
-  - name: save root password in .my.cnf
-    template:
-      src: root_cnf.j2
-      dest: /root/.my.cnf
-      owner: root
-      mode: 0600
-
-- name: create a new database
-  mysql_db:
+- name: Create a new database
+  community.mysql.mysql_db:
     name: "{{ mysql_db }}"
     collation: utf8_general_ci
     encoding: utf8
     state: present
 
-- name: create database user
-  mysql_user:
+- name: Create database user
+  community.mysql.mysql_user:
     name: "{{ mysql_user_name }}"
     host: '%'
     password: "{{ mysql_user_password }}"
     priv: "{{ mysql_priv }}"
     state: present
 
-- name: remove test DB
-  mysql_db:
+- name: Remove test DB
+  community.mysql.mysql_db:
     name: test
     state: absent
 
-- name: remove anonymous user
-  mysql_user:
+- name: Remove anonymous user
+  community.mysql.mysql_user:
     name: ''
     state: absent

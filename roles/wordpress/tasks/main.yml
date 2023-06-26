@@ -1,28 +1,27 @@
 ---
+- name: Create root directory
+  ansible.builtin.file:
+    path: /var/www/{{ server_name }}
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data
+    mode: "0755"
 
-  - name: create root directory
-    file:
-      path: /var/www/{{ server_name }}
-      state: directory
-      recurse: true
-      owner: www-data
-      group: www-data
-      mode: 0755
+- name: Download and unpack latest WordPress
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: /var/www/{{ server_name }}
+    owner: www-data
+    group: www-data
+    mode: "0755"
+    remote_src: true
+    creates: /var/www/{{ server_name }}/wordpress
 
-  - name: download and unpack latest WordPress
-    unarchive:
-      src: https://wordpress.org/latest.tar.gz
-      dest: /var/www/{{ server_name }}
-      owner: www-data
-      group: www-data
-      mode: 0755
-      remote_src: true
-      creates: /var/www/{{ server_name }}/wordpress
-
-  - name: replace wp-config
-    template:
-      src: wp-config.php.j2
-      dest: /var/www/{{ server_name }}/wordpress/wp-config.php.j2
-      owner: www-data
-      group: www-data
-      mode: 0755
+- name: Replace wp-config
+  ansible.builtin.template:
+    src: wp-config.php.j2
+    dest: /var/www/{{ server_name }}/wordpress/wp-config.php.j2
+    owner: www-data
+    group: www-data
+    mode: "0755"

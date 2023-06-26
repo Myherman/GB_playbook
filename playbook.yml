@@ -1,25 +1,28 @@
+- name: Install DB
+  hosts: postgress-group
+  become: true
+  roles:
+    - { role: mysql, tags: [mysql] }
 
-- hosts: all
+- name: Install nginx
+  hosts: wordpress-group
   become: true
   vars_files:
     - vars/wordpress.yml
-
   roles:
-    - { role: mysql, tags: [mysql] }
     - { role: nginx, tags: [nginx] }
     - { role: php, tags: [php] }
     - { role: wordpress, tags: [wordpress] }
 
   post_tasks:
-  - name: restart php
-    systemd:
-      name: php{{ php_version }}-fpm
-      state: restarted
-      enabled: true
+    - name: Restart php
+      ansible.builtin.systemd:
+        name: php{{ php_version }}-fpm
+        state: restarted
+        enabled: true
 
-  - name: restart nginx
-    systemd:
-      name: nginx
-      state: restarted
-      enabled: true
-
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+        enabled: true
