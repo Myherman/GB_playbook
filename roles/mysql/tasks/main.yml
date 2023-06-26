@@ -1,4 +1,6 @@
 ---
+- hosts: database-vm
+  tasks:
   - name: install the mysql-server
     apt:
       name: mysql-server
@@ -41,27 +43,27 @@
       owner: root
       mode: 0600
 
-  - name: create a new database
-    mysql_db:
-      name: "{{ mysql_db }}"
-      collation: utf8_general_ci
-      encoding: utf8
-      state: present
+- name: create a new database
+  mysql_db:
+    name: "{{ mysql_db }}"
+    collation: utf8_general_ci
+    encoding: utf8
+    state: present
 
-  - name: create database user
-    mysql_user:
-      name: "{{ mysql_user_name }}"
-      host: '%'
-      password: "{{ mysql_user_password }}"
-      priv: "{{ mysql_priv }}"
-      state: present
+- name: create database user
+  mysql_user:
+    name: "{{ mysql_user_name }}"
+    host: '%'
+    password: "{{ mysql_user_password }}"
+    priv: "{{ mysql_priv }}"
+    state: present
 
-  - name: remove test DB
-    mysql_db:
-      name: test
-      state: absent
+- name: remove test DB
+  mysql_db:
+    name: test
+    state: absent
 
-  - name: remove anonymous user
-    mysql_user:
-      name: ''
-      state: absent
+- name: remove anonymous user
+  mysql_user:
+    name: ''
+    state: absent

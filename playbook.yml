@@ -1,5 +1,5 @@
 
-- hosts: prod
+- hosts: all
   become: true
   vars_files:
     - vars/wordpress.yml
