@@ -15,13 +15,25 @@
   roles:
     - { role: nginx, tags: [nginx] }
     - { role: php, tags: [php] }
-    - { role: wordpress, tags: [wordpress] }
+
 
 - name: Install wordpress
   hosts: wordpress
   become: true
   vars_files:
     - vars/wordpress.yml
+
+  roles:
+    - { role: wordpress, tags: [wordpress] }
+
+ name: Install haProxy
+  hosts: haproxy-vm
+  become: true
+  vars_files:
+    - vars/wordpress.yml
+
+  roles:
+    - { role: haproxy, tags: [haproxy] }
 
   post_tasks:
     - name: Restart php
