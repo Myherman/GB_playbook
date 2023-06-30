@@ -1,17 +1,14 @@
 - name: Install DB
   hosts: database-vm
   become: true
-  vars_files:
-    - vars/wordpress.yml
-
+  
   roles:
     - { role: mysql, tags: [mysql] }
 
 - name: Install nginx
   hosts: nginx
   become: true
-  vars_files:
-    - vars/wordpress.yml
+  
   roles:
     - { role: nginx, tags: [nginx] }
     - { role: php, tags: [php] }
@@ -26,12 +23,10 @@
   roles:
     - { role: wordpress, tags: [wordpress] }
 
- name: Install haProxy
+- name: Install haProxy
   hosts: haproxy-vm
   become: true
-  vars_files:
-    - vars/wordpress.yml
-
+  
   roles:
     - { role: haproxy, tags: [haproxy] }
 
